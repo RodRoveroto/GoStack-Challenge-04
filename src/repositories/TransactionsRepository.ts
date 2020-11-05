@@ -24,36 +24,27 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    let balance: {
-      incomeBalance: number[]
-      outcomeBalance: number[]
-      total: number
-    } = {
-      incomeBalance: [0],
-      outcomeBalance: [0],
-      total: 0
-    }
+    let incomeBalance = [0]
+    let outcomeBalance = [0]
+
     this.transactions.forEach(transaction => {
       transaction.type === 'income'
-        ? balance.incomeBalance.push(transaction.value)
-        : balance.outcomeBalance.push(transaction.value)
-    })
-    balance.total = balance.incomeBalance.reduce((newVal, total) => newVal + total) -
-      balance.outcomeBalance.reduce((newVal, total) => newVal + total)
-    let response: Balance = {
-      income: balance.incomeBalance.reduce((newVal, total) => newVal + total),
-      outcome: balance.outcomeBalance.reduce((newVal, total) => newVal + total),
-      total: balance.total
+        ? incomeBalance.push(transaction.value)
+        : outcomeBalance.push(transaction.value)
+    });
+
+    const balance: Balance = {
+      income: incomeBalance.reduce((newVal, total) => newVal + total),
+      outcome: outcomeBalance.reduce((newVal, total) => newVal + total),
+      total: incomeBalance.reduce((newVal, total) => newVal + total) -
+        outcomeBalance.reduce((newVal, total) => newVal + total)
     }
-    return response
+    return balance
   }
 
   public create({ title, type, value }: CreateTransactionDTO): Transaction {
-
     const transaction = new Transaction({ title, type, value })
-
     this.transactions.push(transaction)
-
     return transaction
 
   }
